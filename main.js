@@ -5,7 +5,7 @@ require([
   "esri/layers/GraphicsLayer"
 ], function (Map, MapView, Graphic, GraphicsLayer) {
 
-  // 使用 ESRI 提供的暗色底圖
+  // 建立地圖與底圖（可選 dark-gray-vector）
   const map = new Map({
     basemap: "dark-gray-vector"
   });
@@ -13,15 +13,15 @@ require([
   const view = new MapView({
     container: "viewDiv",
     map: map,
-    center: [121.5637, 25.0375], // 台北
-    zoom: 14
+    center: [121.5, 25.03],  // 台灣中部
+    zoom: 8
   });
 
   const graphicsLayer = new GraphicsLayer();
   map.add(graphicsLayer);
 
-  // 載入 youbike.csv（需 local server 支援）
-  fetch("data/youbike.csv")
+  // 載入 CSV 資料（需配合本機伺服器或 GitHub Pages）
+  fetch("data/social_housing.csv")
     .then(response => response.text())
     .then(text => {
       const lines = text.trim().split("\n");
@@ -29,61 +29,42 @@ require([
       const data = lines.slice(1).map(line => {
         const parts = line.split(",");
         const obj = {};
-        headers.forEach((h, i) => obj[h] = parts[i]);
+        headers.forEach((h, i) => obj[h.trim()] = parts[i]);
         return obj;
       });
 
-      // 動畫播放
-      let i = 0;
-      const delay = 800;
+      data.forEach(d => {
+        const lat = parseFloat(d["Latitude"]);
+        const lng = parseFloat(d["Longitude"]);
+        const name = d["案名"];
+        const address = d["地址"];
 
-      const interval = setInterval(() => {
-        if (i >= data.length) {
-          clearInterval(interval);
-          return;
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const point = {
+            type: "point",
+            latitude: lat,
+            longitude: lng
+          };
+
+          const symbol = {
+            type: "simple-marker",
+            color: "orange",
+            size: 8
+          };
+
+          const popupTemplate = {
+            title: name,
+            content: address
+          };
+
+          const graphic = new Graphic({
+            geometry: point,
+            symbol: symbol,
+            popupTemplate: popupTemplate
+          });
+
+          graphicsLayer.add(graphic);
         }
-
-        const d = data[i];
-        const start = {
-          type: "point",
-          longitude: +d.start_lng,
-          latitude: +d.start_lat
-        };
-        const end = {
-          type: "point",
-          longitude: +d.end_lng,
-          latitude: +d.end_lat
-        };
-
-        const startSymbol = {
-          type: "simple-marker",
-          color: "cyan",
-          size: "8px"
-        };
-
-        const endSymbol = {
-          type: "simple-marker",
-          color: "yellow",
-          size: "8px"
-        };
-
-        const lineSymbol = {
-          type: "simple-line",
-          color: [200, 200, 255],
-          width: 2
-        };
-        graphicsLayer.add(new Graphic({ geometry: start, symbol: startSymbol }));
-        graphicsLayer.add(new Graphic({ geometry: end, symbol: endSymbol }));
-
-        graphicsLayer.add(new Graphic({
-          geometry: {
-            type: "polyline",
-            paths: [[start.longitude, start.latitude], [end.longitude, end.latitude]]
-          },
-          symbol: lineSymbol
-        }));
-
-        i++;
-      }, delay);
+      });
     });
 });
