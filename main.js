@@ -1,3 +1,14 @@
+// ✅ 定義台灣民國年轉換函式
+function parseTaiwanDate(dateStr) {
+  if (!dateStr || typeof dateStr !== "string") return null;
+  const parts = dateStr.split("/");
+  if (parts.length !== 3) return null;
+  const year = parseInt(parts[0], 10) + 1911;
+  const month = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  return new Date(year, month, day);
+}
+
 require([
   "esri/Map",
   "esri/views/MapView",
@@ -12,20 +23,30 @@ require([
   const view = new MapView({
     container: "viewDiv",
     map: map,
-    center: [121.5, 25.03],  // 台灣中部
+    center: [121.5, 25.03],
     zoom: 8
   });
 
   const graphicsLayer = new GraphicsLayer();
   map.add(graphicsLayer);
 
-  // ✅ 使用 d3.csv() 直接載入 CSV
   d3.csv("data/social_housing.csv").then(function(data) {
+    const today = new Date();
+
     data.forEach(d => {
       const lat = parseFloat(d["Latitude"]);
       const lng = parseFloat(d["Longitude"]);
-      const name = d["案名"];
-      const address = d["地址"];
+      const startDate = parseTaiwanDate(d["動工日期"]);
+      const endDate = parseTaiwanDate(d["(預計)完工日期"]);
+
+      let color = "gray";
+      if (startDate && today >= startDate) {
+        if (endDate && today >= endDate) {
+          color = "green"; // 已完工
+        } else {
+          color = "orange"; // 施工中
+        }
+      }
 
       if (!isNaN(lat) && !isNaN(lng)) {
         const point = {
@@ -36,7 +57,7 @@ require([
 
         const symbol = {
           type: "simple-marker",
-          color: "orange",
+          color: color,
           size: 8
         };
 
@@ -50,7 +71,6 @@ require([
             <b>(預計)完工日期：</b>${d["(預計)完工日期"] || "－"}<br>
           `
         };
-        
 
         const graphic = new Graphic({
           geometry: point,
