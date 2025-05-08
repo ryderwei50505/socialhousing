@@ -40,11 +40,14 @@ require([
       const endDate = parseTaiwanDate(d["(預計)完工日期"]);
 
       let color = "gray";
+      let status  = "規劃中"
       if (startDate && today >= startDate) {
         if (endDate && today >= endDate) {
           color = "green"; // 已完工
+          status = "已完工";
         } else {
           color = "orange"; // 施工中
+          status = "施工中";
         }
       }
 
@@ -69,6 +72,7 @@ require([
             <b>戶數：</b>${d["戶數"] || "－"} 戶<br>
             <b>動工日期：</b>${d["動工日期"] || "－"}<br>
             <b>(預計)完工日期：</b>${d["(預計)完工日期"] || "－"}<br>
+            <b>施工狀態：</b>${[status] || "－"}<br>
           `
         };
 
