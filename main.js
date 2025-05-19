@@ -44,7 +44,7 @@ require([
       if (startDate && today >= startDate) {
         if (endDate && today >= endDate) {
           status = "已完工";
-        } else {
+        } else {  
           status = "施工中";
         }
       }
