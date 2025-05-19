@@ -64,15 +64,15 @@ require([
         const symbol = {
           type: "picture-marker",
           url: imagePath,
-          width: "40px",
-          height: "40px"
+          width: "60px",
+          height: "60px"
         };
         
 
         const popupTemplate = {
           title: d["案名"],
           content: `
-            <b>地址：</b>${d["地址"]}<br>
+            <b>地址：</b>${d["地址/地號(TWD97座標)"]}<br>
             <b>樓數：</b>${d["棟數"] || "－"} 樓<br>
             <b>戶數：</b>${d["戶數"] || "－"} 戶<br>
             <b>動工日期：</b>${d["動工日期"] || "－"}<br>
