@@ -23,7 +23,7 @@ require([
   const view = new MapView({
     container: "viewDiv",
     map: map,
-    center: [121.5, 25.03],//台灣中心點
+    center: [121.5, 25.03], // 台灣中心點
     zoom: 8
   });
 
@@ -39,20 +39,20 @@ require([
       const startDate = parseTaiwanDate(d["動工日期"]);
       const endDate = parseTaiwanDate(d["(預計)完工日期"]);
 
-      // ✅ 依照日期判斷施工狀態
+      // ✅ 判斷施工狀態
       let status = "規劃中";
       if (startDate && today >= startDate) {
         if (endDate && today >= endDate) {
           status = "已完工";
-        } else {  
+        } else {
           status = "施工中";
         }
       }
-      let imagePath = "images/planning.png";
-      if (status === "施工中") imagePath = "images/building.png";
-      if (status === "已完工") imagePath = "images/finished.png";
-      if (status === "規劃中") imagePath = "images/planning.png";
 
+      // ✅ 對應顏色
+      let color = "white";
+      if (status === "施工中") color = "orange";
+      if (status === "已完工") color = "green";
 
       if (!isNaN(lat) && !isNaN(lng)) {
         const point = {
@@ -62,17 +62,20 @@ require([
         };
 
         const symbol = {
-          type: "picture-marker",
-          url: imagePath,
-          width: "60px",
-          height: "60px"
+          type: "simple-marker",
+          style: "circle",
+          color: color,
+          size: 12,
+          outline: {
+            color: "black",
+            width: 1
+          }
         };
-        
 
         const popupTemplate = {
           title: d["案名"],
           content: `
-            <b>地址：</b>${d["地址/地號(TWD97座標)"]}<br>
+            <b>地址：</b>${d["地址"]}<br>
             <b>樓數：</b>${d["棟數"] || "－"} 樓<br>
             <b>戶數：</b>${d["戶數"] || "－"} 戶<br>
             <b>動工日期：</b>${d["動工日期"] || "－"}<br>
