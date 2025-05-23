@@ -2,29 +2,32 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>社會住宅發展</title>
+  <title>社會住宅發展時間軸</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/dark/main.css" />
   <style>
     html, body, #viewDiv {
-      padding: 0;
       margin: 0;
+      padding: 0;
       height: 100%;
       width: 100%;
       font-family: sans-serif;
     }
 
-    #legend {
+    #legend, #time-control, #stats, #filter-control {
       position: absolute;
-      bottom: 20px;
-      left: 20px;
       background-color: rgba(30, 30, 30, 0.85);
+      color: white;
       padding: 10px 12px;
       border-radius: 6px;
-      color: white;
       font-size: 14px;
-      line-height: 1.6;
       z-index: 99;
       box-shadow: 0 0 6px black;
+    }
+
+    #legend {
+      bottom: 20px;
+      left: 20px;
+      line-height: 1.6;
     }
 
     .legend-dot {
@@ -37,41 +40,93 @@
       border: 1px solid black;
     }
 
-    .legend-dot.planning {
+    .legend-dot.planning { background-color: white; }
+    .legend-dot.building { background-color: orange; }
+    .legend-dot.finished { background-color: green; }
+
+    #time-control {
+      top: 20px;
+      right: 20px;
+    }
+
+    #timeSlider {
+      width: 200px;
+      margin-top: 6px;
+    }
+
+    #playBtn {
+      margin-top: 8px;
+      padding: 4px 10px;
+      cursor: pointer;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    #stats {
+      top: 120px;
+      right: 20px;
+      line-height: 1.6;
+    }
+
+    #filter-control {
+      top: 20px;
+      left: 20px;
+    }
+
+    .filter-btn {
+      margin-right: 6px;
+      padding: 4px 8px;
+      border: 1px solid white;
+      border-radius: 4px;
+      background-color: transparent;
+      color: white;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
       background-color: white;
-    }
-
-    .legend-dot.building {
-      background-color: orange;
-    }
-
-    .legend-dot.finished {
-      background-color: green;
-    }
-
-    @media screen and (max-width: 600px) {
-      #legend {
-        left: auto;
-        right: 10px;
-        bottom: 80px;
-        font-size: 12px;
-        padding: 8px;
-        width: 150px;
-      }
+      color: black;
     }
   </style>
 </head>
 <body>
-  <div id="legend" class="legend-box">
+  <!-- 圖例 -->
+  <div id="legend">
     <h4>施工狀態圖例</h4>
     <div><span class="legend-dot planning"></span> 規劃中</div>
     <div><span class="legend-dot building"></span> 施工中</div>
     <div><span class="legend-dot finished"></span> 已完工</div>
   </div>
 
+  <!-- 時間控制 -->
+  <div id="time-control">
+    <div>模擬日期：<span id="currentDate">2025年10月</span></div>
+    <input type="range" id="timeSlider" min="0" max="118" value="118" step="1" />
+    <button id="playBtn">▶ 播放</button>
+  </div>
+
+  <!-- 統計區 -->
+  <div id="stats">
+    <div>規劃中：<span id="countPlanning">0</span></div>
+    <div>施工中：<span id="countBuilding">0</span></div>
+    <div>已完工：<span id="countFinished">0</span></div>
+  </div>
+
+  <!-- 篩選狀態 -->
+  <div id="filter-control">
+    <button class="filter-btn active" data-status="規劃中">規劃中</button>
+    <button class="filter-btn active" data-status="施工中">施工中</button>
+    <button class="filter-btn active" data-status="已完工">已完工</button>
+  </div>
+
   <div id="viewDiv"></div>
+
+  <!-- 套件 -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://js.arcgis.com/4.29/"></script>
   <script src="main.js"></script>
 </body>
 </html>
+  
