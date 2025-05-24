@@ -43,7 +43,8 @@ function updateGraphics(simDate) {
       }
     }
 
-    count[status]++;
+    const households = parseInt(d["戶數"]) || 0;
+    count[status] += households;
 
     if (!activeFilters.has(status)) return;
     if (isNaN(lat) || isNaN(lng)) return;
